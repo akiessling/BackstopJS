@@ -15,7 +15,8 @@ const optionsDescription = {
   '--config': 'Path to config file name',
   '--filter': 'A RegEx string used to filter by scenario labels when running "test", "reference", or "approve" commands',
   '-h, --help': 'Display usage',
-  '-v, --version': 'Display version',
+  '--version': 'Display version',
+  '-v, -vv, -vvv': 'Verbosity levels (log, info, debug)',
   '-i': 'Prevent deletion of non-matching reference files when running "reference" command (newer matching reference files are still overwritten)'
 };
 

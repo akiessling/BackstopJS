@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const version = require('../../package').version;
 const fs = require('./fs');
+const logger = require('./logger')('Docker');
 
 const DEFAULT_DOCKER_COMMAND_TEMPLATE = 'docker run --rm -it --mount type=bind,source="{cwd}",target=/src backstopjs/backstopjs:{version} {backstopCommand} {args}';
 
@@ -52,7 +53,7 @@ module.exports.runDocker = async (config, backstopCommand) => {
       .replace(/{backstopCommand}/, backstopCommand)
       .replace(/{args}/, backstopArgs);
 
-    console.log('Delegating command to Docker...', dockerCommand);
+    logger.log('Delegating command to Docker...', dockerCommand);
 
     return new Promise((resolve, reject) => {
       const dockerProcess = spawn(dockerCommand, { stdio: 'inherit', shell: true });

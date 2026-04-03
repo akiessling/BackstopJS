@@ -54,7 +54,7 @@ function decorateConfigForCapture (config, isReference) {
   config.screenshotDateTime = screenshotDateTime;
 
   if (configJSON.dynamicTestId) {
-    console.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
+    logger.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
   }
 
   configJSON.env = cloneDeep(config);
@@ -82,6 +82,36 @@ function decorateConfigForCapture (config, isReference) {
 
 function saveViewportIndexes (viewport, index) {
   return Object.assign({}, viewport, { vIndex: index });
+}
+
+class ProgressBar {
+  constructor (total) {
+    this.total = total;
+    this.completed = 0;
+    this.startTime = Date.now();
+  }
+
+  update () {
+    this.completed++;
+    const verbosity = parseInt(process.env.BACKSTOP_VERBOSITY || 0);
+    if (verbosity > 0 || !process.stdout.isTTY) return;
+
+    const percent = Math.round((this.completed / this.total) * 100);
+    const elapsed = (Date.now() - this.startTime) / 1000;
+    const rate = this.completed / elapsed;
+    const remaining = isFinite(rate) && rate > 0 ? Math.round((this.total - this.completed) / rate) : 0;
+    const barLength = 20;
+    const filled = Math.floor((this.completed / this.total) * barLength);
+    const bar = '[' + '#'.repeat(filled) + '-'.repeat(barLength - filled) + ']';
+
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(`${bar} ${percent}% | ${this.completed}/${this.total} targets | ETA: ${remaining}s`);
+
+    if (this.completed === this.total) {
+      process.stdout.write('\n');
+    }
+  }
 }
 
 function delegateScenarios (config) {
@@ -127,20 +157,33 @@ function delegateScenarios (config) {
     });
   });
 
+  const pb = new ProgressBar(scenarioViews.length);
   const asyncCaptureLimit = config.asyncCaptureLimit === 0 ? 1 : config.asyncCaptureLimit || CONCURRENCY_DEFAULT;
 
   if (config.engine.startsWith('puppet')) {
-    return pMap(scenarioViews, runPuppet, { concurrency: asyncCaptureLimit });
+    const wrappedPuppet = (view) => {
+      return runPuppet(view).then(res => {
+        pb.update();
+        return res;
+      });
+    };
+    return pMap(scenarioViews, wrappedPuppet, { concurrency: asyncCaptureLimit });
   } else if (config.engine.startsWith('play')) {
+    const wrappedPlaywright = (view) => {
+      return runPlaywright(view).then(res => {
+        pb.update();
+        return res;
+      });
+    };
     return new Promise((resolve, reject) => {
       createPlaywrightBrowser(config).then(browser => {
-        console.log('Browser created');
+        logger.log('Browser created');
 
         for (const view of scenarioViews) {
           view._playwrightBrowser = browser;
         }
 
-        pMap(scenarioViews, runPlaywright, { concurrency: asyncCaptureLimit }).then(out => {
+        pMap(scenarioViews, wrappedPlaywright, { concurrency: asyncCaptureLimit }).then(out => {
           disposePlaywrightBrowser(browser).then(() => resolve(out));
         }, e => {
           disposePlaywrightBrowser(browser).then(() => reject(e));

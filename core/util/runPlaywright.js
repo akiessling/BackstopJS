@@ -7,6 +7,7 @@ const _ = require('lodash');
 const ensureDirectoryPath = require('./ensureDirectoryPath');
 const injectBackstopTools = require('../../capture/backstopTools.js');
 const engineTools = require('./engineTools');
+const logger = require('./logger')('Playwright');
 
 const TEST_TIMEOUT = 60000;
 const DEFAULT_FILENAME_TEMPLATE = '{configId}_{scenarioLabel}_{selectorIndex}_{selectorLabel}_{viewportIndex}_{viewportLabel}';
@@ -31,7 +32,7 @@ const VIEWPORT_SELECTOR = 'viewport';
  * @returns {import('playwright').Browser}
  */
 module.exports.createPlaywrightBrowser = async function (config) {
-  console.log('Creating Browser');
+  logger.log('Creating Browser');
 
   // Copy and destructure engineOptions for headless mode sanitization
   let { engineOptions: sanitizedEngineOptions } = JSON.parse(JSON.stringify(config));
@@ -41,18 +42,18 @@ module.exports.createPlaywrightBrowser = async function (config) {
 
   // Use Chrommium if no browser set in `engineOptions`
   if (!browserChoice) {
-    console.warn(chalk.yellow('No Playwright browser specified, assuming Chromium.'));
+    logger.warn(chalk.yellow('No Playwright browser specified, assuming Chromium.'));
     browserChoice = 'chromium';
   }
 
   // Warn when using an unrecognized variant of `headless` mode
   if (typeof headless === 'string' && headless !== 'new') {
-    console.warn(chalk.yellow(`The headless mode, "${headless}", may not be supported by Playwright.`));
+    logger.warn(chalk.yellow(`The headless mode, "${headless}", may not be supported by Playwright.`));
   }
 
   // Error when using unknown `browserChoice`
   if (!playwright[browserChoice]) {
-    console.error(chalk.red(`Unsupported Playwright browser "${browserChoice}"`));
+    logger.error(chalk.red(`Unsupported Playwright browser "${browserChoice}"`));
     return;
   }
 
@@ -118,7 +119,7 @@ module.exports.runPlaywright = function ({ scenario, viewport, config, _playwrig
 };
 
 module.exports.disposePlaywrightBrowser = async function (browser) {
-  console.log('Disposing Browser');
+  logger.log('Disposing Browser');
   await browser.close();
 };
 
@@ -158,7 +159,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.setDefaultNavigationTimeout(engineTools.getEngineOption(config, 'waitTimeout', TEST_TIMEOUT));
 
   if (isReference) {
-    console.log(chalk.blue('CREATING NEW REFERENCE FILE'));
+    logger.log(chalk.blue('CREATING NEW REFERENCE FILE'));
   }
 
   // --- set up console output and ready event ---
@@ -170,7 +171,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       readyResolve = resolve;
       // fire the ready event after the readyTimeout
       readyTimeoutTimer = setTimeout(() => {
-        console.error(chalk.red(`ReadyEvent not detected within readyTimeout limit. (${readyTimeout} ms)`), scenario.url);
+        logger.error(chalk.red(`ReadyEvent not detected within readyTimeout limit. (${readyTimeout} ms)`), scenario.url);
         resolve();
       }, readyTimeout);
     });
@@ -179,7 +180,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.on('console', msg => {
     for (let i = 0; i < msg.args().length; ++i) {
       const line = msg.args()[i];
-      console.log(`Browser Console Log ${i}: ${line}`);
+      logger.log(`Browser Console Log ${i}: ${line}`);
       if (readyEvent && new RegExp(readyEvent).test(line)) {
         readyResolve();
       }
@@ -195,7 +196,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(beforeScriptPath)) {
         await require(beforeScriptPath)(page, scenario, viewport, isReference, browserContext, config);
       } else {
-        console.warn('WARNING: script not found: ' + beforeScriptPath);
+        logger.warn('WARNING: script not found: ' + beforeScriptPath);
       }
     }
 
@@ -259,7 +260,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(readyScriptPath)) {
         await require(readyScriptPath)(page, scenario, viewport, isReference, browserContext, config);
       } else {
-        console.warn('WARNING: script not found: ' + readyScriptPath);
+        logger.warn('WARNING: script not found: ' + readyScriptPath);
       }
     }
 
@@ -315,8 +316,8 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
 
   let error;
   await playwrightCommands().catch(e => {
-    console.log(chalk.red(`Playwright encountered an error while running scenario "${scenario.label}"`));
-    console.log(chalk.red(e));
+    logger.log(chalk.red(`Playwright encountered an error while running scenario "${scenario.label}"`));
+    logger.log(chalk.red(e));
     error = e;
   });
 
@@ -416,7 +417,7 @@ async function delegateSelectors (
       }
       job = captureJobs.shift();
       job().catch(function (e) {
-        console.log(e);
+        logger.log(e);
         errors.push(e);
       }).then(function () {
         next();
@@ -424,10 +425,10 @@ async function delegateSelectors (
     };
     next();
   }).then(async () => {
-    console.log(chalk.green('x Close Browser'));
+    logger.log(chalk.green('x Close Browser'));
     await browserContext.close();
   }).catch(async (err) => {
-    console.log(chalk.red(err));
+    logger.log(chalk.red(err));
     await browserContext.close();
   }).then(_ => compareConfig);
 }
@@ -445,7 +446,7 @@ async function captureScreenshot (page, browserContext, selector, selectorMap, c
         fullPage
       });
     } catch (e) {
-      console.log(chalk.red('Error capturing..'), e);
+      logger.log(chalk.red('Error capturing..'), e);
       return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
     }
   } else {
@@ -471,11 +472,11 @@ async function captureScreenshot (page, browserContext, selector, selectorMap, c
 
           await type.screenshot(params);
         } else {
-          console.log(chalk.yellow(`Element not visible for capturing: ${s}`));
+          logger.log(chalk.yellow(`Element not visible for capturing: ${s}`));
           return fs.copy(config.env.backstop + HIDDEN_SELECTOR_PATH, path);
         }
       } else {
-        console.log(chalk.magenta(`Element not found for capturing: ${s}`));
+        logger.log(chalk.magenta(`Element not found for capturing: ${s}`));
         return fs.copy(config.env.backstop + SELECTOR_NOT_FOUND_PATH, path);
       }
     };
@@ -488,7 +489,7 @@ async function captureScreenshot (page, browserContext, selector, selectorMap, c
         try {
           await selectorShot(selector, filePath);
         } catch (e) {
-          console.log(chalk.red(`Error capturing Element ${selector}`), e);
+          logger.log(chalk.red(`Error capturing Element ${selector}`), e);
           return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
         }
       }
@@ -502,7 +503,7 @@ function translateUrl (url) {
   const RE = /^[./]/;
   if (RE.test(url)) {
     const fileUrl = 'file://' + path.join(process.cwd(), url);
-    console.log('Relative filename detected -- translating to ' + fileUrl);
+    logger.log('Relative filename detected -- translating to ' + fileUrl);
     return fileUrl;
   } else {
     return url;

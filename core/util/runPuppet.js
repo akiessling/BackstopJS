@@ -7,6 +7,7 @@ const _ = require('lodash');
 const ensureDirectoryPath = require('./ensureDirectoryPath');
 const injectBackstopTools = require('../../capture/backstopTools.js');
 const engineTools = require('./engineTools');
+const globalLogger = require('./logger')('Puppeteer');
 
 const MIN_CHROME_VERSION = 62;
 const TEST_TIMEOUT = 60000;
@@ -46,7 +47,7 @@ module.exports = function ({ scenario, viewport, config }) {
 
 function loggerAction (action, color, message, ...rest) {
   this.logged.push([action, color, message.toString(), JSON.stringify(rest)]);
-  console[action](chalk[color](message), ...rest);
+  globalLogger[action](chalk[color](message), ...rest);
 }
 
 async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabelSafe, viewport, config, logger) {

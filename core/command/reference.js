@@ -22,7 +22,7 @@ module.exports = {
       return firstStep.then(function () {
         return createBitmaps(config, true);
       }).then(function () {
-        console.log('\nRun `$ backstop test` to generate diff report.\n');
+        logger.log('\nRun `$ backstop test` to generate diff report.\n');
         return engineErrors(config);
       });
     }

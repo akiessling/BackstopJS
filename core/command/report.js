@@ -130,14 +130,14 @@ function writeBrowserReport (config, reporter) {
     // This scenario with all viewport variants will be appended to any existing report.
     if (testConfig.dynamicTestId) {
       try {
-        console.log('Attempting to open: ', testReportJsonName);
+        logger.log('Attempting to open: ', testReportJsonName);
         const testReportJson = require(testReportJsonName);
         const scenarioFileNames = browserReporter.tests.map(test => test.pair.fileName);
         testReportJson.tests = testReportJson.tests.filter(test => !scenarioFileNames.includes(test.pair.fileName));
         browserReporter.tests.map(test => testReportJson.tests.push(test));
         browserReporter = testReportJson;
       } catch (err) {
-        console.log('Creating new report.');
+        logger.log('Creating new report.');
       }
     }
 
@@ -243,14 +243,14 @@ function writeJsonReport (config, reporter) {
     // This scenario with all viewport variants will be appended to any existing report.
     if (testConfig.dynamicTestId) {
       try {
-        console.log('Attempting to open: ', jsonReportFileName);
+        logger.log('Attempting to open: ', jsonReportFileName);
         const jsonReportJson = require(jsonReportFileName);
         const scenarioFileNames = jsonReporter.tests.map(test => test.pair.fileName);
         jsonReportJson.tests = jsonReportJson.tests.filter(test => !scenarioFileNames.includes(test.pair.fileName));
         jsonReporter.tests.map(test => jsonReportJson.tests.push(test));
         jsonReporter = jsonReportJson;
       } catch (err) {
-        console.log('Creating new report.');
+        logger.log('Creating new report.');
       }
     }
 

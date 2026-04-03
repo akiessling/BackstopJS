@@ -9,7 +9,7 @@ const FILTER_DEFAULT = /\w+/;
 module.exports = {
   execute: function (config) {
     // TODO:  IF Exists config.bitmaps_test  &&  list.length > 0n  (otherwise throw)
-    console.log('Copying from ' + config.bitmaps_test + ' to ' + config.bitmaps_reference + '.');
+    logger.log('Copying from ' + config.bitmaps_test + ' to ' + config.bitmaps_reference + '.');
     return new Promise((resolve, reject) => {
       fs.readdir(config.bitmaps_test, (err, list) => {
         if (err) {
@@ -22,7 +22,7 @@ module.exports = {
             console.log(err.stack);
             reject(err);
           }
-          console.log('The following files will be promoted to reference...');
+          logger.log('The following files will be promoted to reference...');
 
           return map(files, (file) => {
             if (FAILED_DIFF_RE.test(file)) {
@@ -33,7 +33,7 @@ module.exports = {
                 imageFilter = new RegExp(config.args.filter);
               }
               if (imageFilter.test(file)) {
-                console.log('> ', file);
+                logger.log('> ', file);
                 return fs.copy(path.join(src, file), path.join(config.bitmaps_reference, file));
               }
             }

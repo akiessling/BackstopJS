@@ -109,3 +109,17 @@ export const closeLogModal = value => {
     value
   };
 };
+
+export const sortTests = method => {
+  return {
+    type: 'SORT_TESTS',
+    method
+  };
+};
+
+export const filterByDiff = percent => {
+  return {
+    type: 'FILTER_BY_DIFF',
+    percent
+  };
+};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight } from '../../actions';
+import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight, sortTests, filterByDiff } from '../../actions';
 import { fonts } from '../../styles';
 
 import { colors, shadows } from '../../styles';
@@ -60,6 +60,15 @@ const Input = styled.input`
   padding: 2px 5px;
   font-family: ${fonts.latoRegular};
   font-size: 14px;
+`;
+
+const Select = styled.select`
+  border: 1px solid ${colors.borderGray};
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: ${fonts.latoRegular};
+  font-size: 14px;
+  max-width: 140px;
 `;
 
 class SettingsPopup extends React.Component {
@@ -140,6 +149,26 @@ class SettingsPopup extends React.Component {
             onChange={(e) => this.props.onUpdateImageHeight(e.target.value)}
           />
         </WrapperOption>
+        <hr style={{ border: 'none', borderBottom: `1px solid ${colors.borderGray}`, margin: '10px 0' }} />
+        <WrapperOption>
+          <span>Sort by</span>
+          <Select value={this.props.tests.sortMethod || 'default'} onChange={(e) => this.props.onSort(e.target.value)}>
+            <option value="default">Default</option>
+            <option value="diffAsc">Diff % (Asc)</option>
+            <option value="diffDesc">Diff % (Desc)</option>
+            <option value="labelAsc">Label (Asc)</option>
+            <option value="labelDesc">Label (Desc)</option>
+          </Select>
+        </WrapperOption>
+        <WrapperOption>
+          <span>Min Diff %</span>
+          <Input
+            type="number"
+            step="0.1"
+            value={this.props.tests.minDiff || 0}
+            onChange={(e) => this.props.onFilterByDiff(e.target.value)}
+          />
+        </WrapperOption>
       </PopupWrapper>
     );
   }
@@ -147,7 +176,8 @@ class SettingsPopup extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    settings: state.layoutSettings
+    settings: state.layoutSettings,
+    tests: state.tests
   };
 };
 
@@ -164,6 +194,12 @@ const mapDispatchToProps = dispatch => {
     },
     onUpdateImageHeight: value => {
       dispatch(updateImageHeight(value));
+    },
+    onSort: method => {
+      dispatch(sortTests(method));
+    },
+    onFilterByDiff: percent => {
+      dispatch(filterByDiff(percent));
     }
   };
 };

@@ -46,7 +46,10 @@ const defaultState = {
   tests: {
     all: window.tests.tests,
     filtered: window.tests.tests,
-    filterStatus: 'all'
+    filterStatus: 'all',
+    searchValue: '',
+    minDiff: 0,
+    sortMethod: 'default'
   },
   scrubber: {
     visible: false,

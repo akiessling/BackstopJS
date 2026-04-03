@@ -8,10 +8,18 @@ import LogDetails from './LogDetails';
 import { colors, fonts } from '../../styles';
 
 // styled
-const WrapperDetails = styled.div``;
 
 const Row = styled.div`
   padding: 5px 0;
+  ${props => props.sticky && `
+    position: sticky;
+    top: 70px;
+    z-index: 10;
+    background-color: ${colors.cardWhite};
+    box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+    margin: 0 -30px;
+    padding: 10px 30px;
+  `}
 `;
 
 const Label = styled.span`
@@ -81,12 +89,13 @@ class TextDetails extends React.Component {
     const { showPanel } = this.state;
 
     return (
-      <WrapperDetails>
-        <Row hidden={!settings.textInfo}>
+      <>
+        <Row hidden={!settings.textInfo} sticky={settings.textInfo}>
           <Label>label: </Label>
           <Value>{label}</Value>
           <Label>selector: </Label>
           <Value>{selector}</Value>
+          <UrlDetails url={url} referenceUrl={referenceUrl} />
         </Row>
         <Row>
           <Label>filename: </Label>
@@ -115,7 +124,7 @@ class TextDetails extends React.Component {
             <DiffDetails diff={diff} />
           </Row>
         </DetailsPanel>
-      </WrapperDetails>
+      </>
     );
   }
 }

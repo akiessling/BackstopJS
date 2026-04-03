@@ -89,6 +89,20 @@ export const openLogModal = value => {
   };
 };
 
+export const updateImageWidth = value => {
+  return {
+    type: 'UPDATE_IMAGE_WIDTH',
+    value
+  };
+};
+
+export const updateImageHeight = value => {
+  return {
+    type: 'UPDATE_IMAGE_HEIGHT',
+    value
+  };
+};
+
 export const closeLogModal = value => {
   return {
     type: 'CLOSE_LOG_MODAL',

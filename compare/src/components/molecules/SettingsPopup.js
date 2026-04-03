@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { updateSettings, toggleAllImages } from '../../actions';
+import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight } from '../../actions';
+import { fonts } from '../../styles';
 
 import { colors, shadows } from '../../styles';
 
@@ -35,6 +36,30 @@ const PopupWrapper = styled.div`
     right: 30px;
     top: -16px;
   }
+`;
+
+const WrapperOption = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+
+  span {
+    padding-right: 10px;
+    text-align: left;
+    font-family: ${fonts.latoRegular};
+    color: ${colors.primaryText};
+    font-size: 14px;
+  }
+`;
+
+const Input = styled.input`
+  width: 50px;
+  border: 1px solid ${colors.borderGray};
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: ${fonts.latoRegular};
+  font-size: 14px;
 `;
 
 class SettingsPopup extends React.Component {
@@ -99,6 +124,22 @@ class SettingsPopup extends React.Component {
           value={settings.diffImage}
           onToggle={this.onToggle.bind(this, 'diffImage')}
         />
+        <WrapperOption>
+          <span>Max width</span>
+          <Input
+            type="number"
+            value={settings.imageWidth}
+            onChange={(e) => this.props.onUpdateImageWidth(e.target.value)}
+          />
+        </WrapperOption>
+        <WrapperOption>
+          <span>Max height</span>
+          <Input
+            type="number"
+            value={settings.imageHeight}
+            onChange={(e) => this.props.onUpdateImageHeight(e.target.value)}
+          />
+        </WrapperOption>
       </PopupWrapper>
     );
   }
@@ -117,6 +158,12 @@ const mapDispatchToProps = dispatch => {
     },
     toggleAll: value => {
       dispatch(toggleAllImages(value));
+    },
+    onUpdateImageWidth: value => {
+      dispatch(updateImageWidth(value));
+    },
+    onUpdateImageHeight: value => {
+      dispatch(updateImageHeight(value));
     }
   };
 };

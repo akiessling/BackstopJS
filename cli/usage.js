@@ -7,7 +7,8 @@ const commandsDescription = {
   reference: 'Creates new reference screenshots. Deletes all existing reference files.',
   init: 'Generate BackstopJS boilerplate files in your CWD. NOTE: Overwrites existing config files!',
   remote: 'Launch BackstopJS remote service.',
-  openReport: 'View the last test report in your browser.'
+  openReport: 'View the last test report in your browser.',
+  regenerateReport: 'Regenerate the HTML report from the last test run data.'
 };
 
 const optionsDescription = {

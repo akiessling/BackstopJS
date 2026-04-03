@@ -287,5 +287,6 @@ module.exports = {
     }, function (e) {
       logger.error('Comparison failed with error:' + e);
     });
-  }
+  },
+  writeReport: writeReport
 };

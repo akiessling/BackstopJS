@@ -57,7 +57,9 @@ const defaultState = {
     textInfo: false,
     refImage: true,
     testImage: true,
-    diffImage: true
+    diffImage: true,
+    imageWidth: 0,
+    imageHeight: 0
   }
 };
 
@@ -67,7 +69,11 @@ const defaultState = {
 const state = persistedState
   ? {
       ...defaultState,
-      ...persistedState
+      ...persistedState,
+      layoutSettings: {
+        ...defaultState.layoutSettings,
+        ...(persistedState.layoutSettings || {})
+      }
     }
   : defaultState;
 

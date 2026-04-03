@@ -9,8 +9,8 @@ const BASE64_PNG_STUB =
 
 const Image = styled.img`
   width: auto;
-  max-width: 100%;
-  max-height: ${props => (props.settings.textInfo ? '150px' : '400px')};
+  max-width: ${props => (props.settings.imageWidth && props.settings.imageWidth > 0 ? `${props.settings.imageWidth}px` : '100%')};
+  max-height: ${props => (props.settings.imageHeight && props.settings.imageHeight > 0 ? `${props.settings.imageHeight}px` : 'none')};
 
   &:hover {
     cursor: pointer;

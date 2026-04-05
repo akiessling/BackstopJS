@@ -44,18 +44,55 @@ function modifyJsonpReportHelper (originalJsonpReport, approvedFileName) {
  * @return {Promise}
  */
 async function modifyJsonpReport ({ reportConfigFilename, approvedFileName }) {
-  return fs
-    .readFile(reportConfigFilename, 'utf8')
-    .then(content => {
-      const jsonpReport = modifyJsonpReportHelper(content[0], approvedFileName);
-      return fs.writeFile(reportConfigFilename, jsonpReport);
-    })
-    .catch(err => {
-      throw new Error(`Failed to modify the report. ${err.message}.`);
+  return updateReportStatus({
+    reportConfigFilename,
+    filter: approvedFileName,
+    status: 'pass'
+  });
+}
+
+/**
+ * Update the test status of the JSONP/JSON report.
+ *
+ * @param {Object} params - the input params
+ * @param {String} params.reportConfigFilename - the path to the config.js file (JSONP)
+ * @param {String} [params.reportJsonFilename] - the path to the report.json file (optional)
+ * @param {String} params.filter - the name of the screenshot to update
+ * @param {String} params.status - the new status ('pass', 'fail', 'acknowledged')
+ * @return {Promise}
+ */
+async function updateReportStatus ({ reportConfigFilename, reportJsonFilename, filter, status }) {
+  try {
+    const result = await fs.readFile(reportConfigFilename, 'utf8');
+    // The custom promisify implementation resolves with an array of arguments (e.g., [data])
+    const configContent = Array.isArray(result) ? result[0] : result;
+    const report = extractReport(configContent);
+
+    report.tests.forEach(test => {
+      if (test.pair.fileName === filter) {
+        test.status = status;
+        if (status === 'pass') {
+          delete test.pair.diffImage;
+        }
+      }
     });
+
+    const jsonReport = JSON.stringify(report, null, 2);
+    const jsonpReport = `report(${jsonReport});`;
+
+    const promises = [fs.writeFile(reportConfigFilename, jsonpReport)];
+    if (reportJsonFilename) {
+      promises.push(fs.writeFile(reportJsonFilename, jsonReport));
+    }
+
+    return Promise.all(promises);
+  } catch (err) {
+    throw new Error(`Failed to update the report status. ${err.message}.`);
+  }
 }
 
 module.exports = {
   modifyJsonpReport,
-  modifyJsonpReportHelper
+  modifyJsonpReportHelper,
+  updateReportStatus
 };

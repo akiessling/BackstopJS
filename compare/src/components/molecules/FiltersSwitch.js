@@ -46,6 +46,11 @@ class FiltersSwitch extends React.Component {
         count: tests.all.filter(e => e.status === 'pass').length
       },
       {
+        id: 'acknowledged',
+        label: 'acknowledged',
+        count: tests.all.filter(e => e.status === 'acknowledged').length
+      },
+      {
         id: 'fail',
         label: 'failed',
         count: tests.all.filter(e => e.status === 'fail').length

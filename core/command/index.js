@@ -22,7 +22,8 @@ const commandNames = [
   'approve',
   'version',
   'stop',
-  'regenerateReport'
+  'regenerateReport',
+  'serve'
 ];
 
 /* Commands that are only exposed to higher levels */
@@ -35,7 +36,8 @@ const exposedCommandNames = [
   'approve',
   'version',
   'stop',
-  'regenerateReport'
+  'regenerateReport',
+  'serve'
 ];
 
 /* Used to convert an array of objects {name, execute} to a unique object {[name]: execute} */

@@ -201,14 +201,15 @@ class SettingsPopup extends React.Component {
             onChange={(e) => this.props.onFilterByDiff(e.target.value)}
           />
         </WrapperOption>
-        {this.props.tests.all && [...new Set(this.props.tests.all.map(t => t.pair.viewportLabel))].length > 1 && (
+        {this.props.tests.all && [...new Set(this.props.tests.all.map(t => t.pair && t.pair.viewportLabel).filter(Boolean))].length > 1 && (
           <>
             <hr style={{ border: 'none', borderBottom: `1px solid ${colors.borderGray}`, margin: '10px 0' }} />
             <ViewportWrapper>
               <span>Viewports</span>
-              {[...new Set(this.props.tests.all.map(t => t.pair.viewportLabel))].map(viewport => {
-                const isSelected = this.props.tests.selectedViewports.includes(viewport);
-                const canToggle = !isSelected || this.props.tests.selectedViewports.length > 1;
+              {[...new Set(this.props.tests.all.map(t => t.pair && t.pair.viewportLabel).filter(Boolean))].map(viewport => {
+                const selectedViewports = this.props.tests.selectedViewports || [];
+                const isSelected = selectedViewports.includes(viewport);
+                const canToggle = !isSelected || selectedViewports.length > 1;
                 return (
                   <ViewportOption key={viewport} disabled={!canToggle}>
                     <input

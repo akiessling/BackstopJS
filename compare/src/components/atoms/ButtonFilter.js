@@ -34,6 +34,11 @@ const Button = styled.button`
     background-color: ${colors.red};
     color: ${colors.white};
   }
+
+  &.acknowledged {
+    background-color: ${colors.yellow};
+    color: ${colors.white};
+  }
 `;
 
 export default class ButtonFilter extends React.Component {

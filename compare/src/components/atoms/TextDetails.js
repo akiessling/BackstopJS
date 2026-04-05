@@ -11,6 +11,9 @@ import { colors, fonts } from '../../styles';
 
 const Row = styled.div`
   padding: 5px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   ${props => props.sticky && `
     position: sticky;
     top: 70px;
@@ -100,12 +103,14 @@ class TextDetails extends React.Component {
           <Label>selector: </Label>
           <Value>{selector}</Value>
           <UrlDetails url={url} referenceUrl={referenceUrl} />
+          {settings.textInfo && this.props.children}
         </Row>
         <Row>
           <Label>#</Label>
           <Value>{counter}</Value>
           <Label>filename: </Label>
           <Value onMouseOver={this.showPanel}>{fileName}</Value>
+          {!settings.textInfo && this.props.children}
         </Row>
         <DiffDetails suppress={!settings.textInfo} diff={diff} />
 

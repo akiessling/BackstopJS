@@ -8,7 +8,8 @@ const commandsDescription = {
   init: 'Generate BackstopJS boilerplate files in your CWD. NOTE: Overwrites existing config files!',
   remote: 'Launch BackstopJS remote service.',
   openReport: 'View the last test report in your browser.',
-  regenerateReport: 'Regenerate the HTML report from the last test run data.'
+  regenerateReport: 'Regenerate the HTML report from the last test run data.',
+  serve: 'Serve the HTML report and enable triage (Acknowledge/Un-acknowledge) features.'
 };
 
 const optionsDescription = {

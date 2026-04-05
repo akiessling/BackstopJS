@@ -67,6 +67,17 @@ const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue
       });
       break;
 
+    case 'ACKNOWLEDGE_TEST':
+      newState = Object.assign({}, state, {
+        all: state.all.map(test => {
+          if (test.pair && (test.pair.fileName === action.id)) {
+            return Object.assign({}, test, { status: action.status });
+          }
+          return test;
+        })
+      });
+      break;
+
     case 'FILTER_TESTS':
       newState = Object.assign({}, state, { filterStatus: action.status });
       break;
@@ -82,8 +93,7 @@ const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue
     case 'SORT_TESTS':
       newState = Object.assign({}, state, { sortMethod: action.method });
       break;
-    
-    case 'TOGGLE_VIEWPORT':
+    case 'TOGGLE_VIEWPORT': {
       const { viewportLabel } = action;
       const isSelected = state.selectedViewports.includes(viewportLabel);
       let newSelectedViewports;
@@ -99,6 +109,7 @@ const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue
       }
       newState = Object.assign({}, state, { selectedViewports: newSelectedViewports });
       break;
+    }
 
     default:
       return state;

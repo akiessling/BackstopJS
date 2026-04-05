@@ -130,3 +130,11 @@ export const toggleViewport = viewportLabel => {
     viewportLabel
   };
 };
+
+export const acknowledgeTest = (id, status) => {
+  return {
+    type: 'ACKNOWLEDGE_TEST',
+    id,
+    status
+  };
+};

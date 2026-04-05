@@ -16,7 +16,7 @@ const Button = styled.button`
   font-size: 12px;
   line-height: auto;
   font-family: ${fonts.latoRegular};
-  background-color: ${colors.borderGray};
+  background-color: ${colors.secondaryText};
   border: none;
   height: 32px;
   border-radius: 3px;

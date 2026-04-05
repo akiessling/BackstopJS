@@ -11,6 +11,7 @@ import NavButtons from '../atoms/NavButtons';
 // molecules
 import TestImages from '../molecules/TestImages';
 import ApproveButton from '../molecules/ApproveButton';
+import AckButton from '../molecules/AckButton';
 
 const CardWrapper = styled.div`
   position: relative;
@@ -26,7 +27,11 @@ const CardWrapper = styled.div`
     display: block;
     width: 8px;
     height: 100%;
-    background-color: ${props => props.status === 'pass' ? colors.green : colors.red};
+    background-color: ${props => {
+      if (props.status === 'pass') return colors.green;
+      if (props.status === 'acknowledged') return colors.yellow;
+      return colors.red;
+    }};
     position: absolute;
     top: 0;
     left: 0;
@@ -37,8 +42,7 @@ const CardWrapper = styled.div`
 `;
 
 const ButtonsWrapper = styled.div`
-  position: absolute;
-  right: 10px;
+  margin-left: auto;
   display: flex;
 `;
 
@@ -54,13 +58,15 @@ export default class TestCard extends React.Component {
 
     return (
       <CardWrapper id={this.props.id} status={status}>
-        <ButtonsWrapper>
-          {status === 'fail' && isRemoteOption() && <ApproveButton fileName={info.fileName}/>}
-          {!onlyText && (
-            <NavButtons currentId={this.props.numId} lastId={this.props.lastId} />
-          )}
-        </ButtonsWrapper>
-        <TextDetails info={info} numId={this.props.numId} lastId={this.props.lastId} />
+        <TextDetails info={info} numId={this.props.numId} lastId={this.props.lastId}>
+          <ButtonsWrapper>
+            {status === 'fail' && isRemoteOption() && <ApproveButton fileName={info.fileName}/>}
+            {(status === 'fail' || status === 'acknowledged') && isRemoteOption() && <AckButton fileName={info.fileName} currentStatus={status} />}
+            {!onlyText && (
+              <NavButtons currentId={this.props.numId} lastId={this.props.lastId} />
+            )}
+          </ButtonsWrapper>
+        </TextDetails>
         <TestImages info={info} status={status} />
         <ErrorMessages info={info} status={status} />
       </CardWrapper>

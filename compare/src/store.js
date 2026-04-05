@@ -77,6 +77,10 @@ const state = persistedState
       layoutSettings: {
         ...defaultState.layoutSettings,
         ...(persistedState.layoutSettings || {})
+      },
+      tests: {
+        ...defaultState.tests,
+        ...(persistedState.tests || {})
       }
     }
   : defaultState;

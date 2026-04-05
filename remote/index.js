@@ -1,28 +1,31 @@
-/* eslint no-console: off */
-'use strict';
-
-const parseArgs = require('minimist');
-const argsOptions = parseArgs(process.argv.slice(2), {
-  string: ['config']
-});
-const PROJECT_PATH = argsOptions._[0];
-const PATH_TO_CONFIG = argsOptions.config;
-const _config = require(argsOptions.config);
-
 const path = require('path');
 const express = require('express');
 const backstop = require('../core/runner');
-const { modifyJsonpReport } = require('../core/util/remote');
+const { modifyJsonpReport, updateReportStatus } = require('../core/util/remote');
 
-const booleanizeArg = incrementalFlag => [true, 'true'].includes(incrementalFlag);
+module.exports = function (app, options = {}) {
+  let _config;
+  let PATH_TO_CONFIG;
 
-module.exports = function (app) {
+  if (options.config) {
+    _config = options.config;
+    PATH_TO_CONFIG = options.configPath || 'provided-config';
+  } else {
+    const parseArgs = require('minimist');
+    const argsOptions = parseArgs(process.argv.slice(2), {
+      string: ['config']
+    });
+    PATH_TO_CONFIG = argsOptions.config;
+    _config = require(argsOptions.config);
+  }
   app._backstop = app._backstop || {};
   app._backstop.testCtr = 0;
   app._backstop.tests = {};
 
   app.use(express.json({ limit: '2mb' })); // support json encoded bodies
   app.use(express.urlencoded({ extended: true, limit: '2mb' })); // support encoded bodies
+
+  const booleanizeArg = incrementalFlag => [true, 'true'].includes(incrementalFlag);
 
   // Handle non-transparent proxy calls from testem (ember compatibility)
   app.use(function (req, res, next) {
@@ -97,20 +100,20 @@ module.exports = function (app) {
   });
 
   app.post('/approve', async (req, res) => {
-    const filter = req.query.filter || '';
-    const config = JSON.parse(JSON.stringify(_config));
-    console.log(`backstop approve --filter=${filter}`);
-
     try {
+      const filter = req.query.filter || '';
+      const config = JSON.parse(JSON.stringify(_config));
+      console.log(`backstop approve --filter=${filter}`);
+
       await backstop('approve', {
         config,
         filter
       });
 
-      const reportConfigFilename = path.join(
-        _config.paths.html_report,
-        'config.js'
-      );
+      const root = _config.html_report || (_config.paths && _config.paths.html_report);
+      if (!root) throw new Error('Cannot find html_report path in BackstopJS config.');
+
+      const reportConfigFilename = path.join(root, 'config.js');
       await modifyJsonpReport({
         reportConfigFilename,
         approvedFileName: filter
@@ -119,7 +122,31 @@ module.exports = function (app) {
       res.send('OK ' + req.query.filter);
     } catch (error) {
       console.log(error);
-      res.status(500).send({ error: error.message });
+      res.status(500).send({ error: error.message || error });
+    }
+  });
+
+  app.post('/acknowledge', async (req, res) => {
+    try {
+      const filter = req.query.filter || '';
+      const status = req.query.status || 'acknowledged';
+      console.log(`acknowledge test --filter=${filter} --status=${status}`);
+
+      const root = _config.html_report || (_config.paths && _config.paths.html_report);
+      if (!root) throw new Error('Cannot find html_report path in BackstopJS config.');
+
+      const reportConfigFilename = path.join(root, 'config.js');
+
+      await updateReportStatus({
+        reportConfigFilename,
+        filter,
+        status
+      });
+
+      res.send('OK ' + filter);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ error: error.message || error });
     }
   });
 

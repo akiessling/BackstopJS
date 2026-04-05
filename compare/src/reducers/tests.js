@@ -1,4 +1,4 @@
-const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod) => {
+const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod, selectedViewports) => {
   let filtered = [...all];
 
   // Status Filter
@@ -24,6 +24,14 @@ const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod) => {
     });
   }
 
+  // Viewport Filter
+  if (selectedViewports && selectedViewports.length > 0) {
+    filtered = filtered.filter(test => {
+      const viewportLabel = test.pair && test.pair.viewportLabel;
+      return selectedViewports.includes(viewportLabel);
+    });
+  }
+
   // Sorting
   if (sortMethod && sortMethod !== 'default') {
     filtered.sort((a, b) => {
@@ -45,7 +53,7 @@ const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod) => {
   return filtered;
 };
 
-const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue: '', minDiff: 0, sortMethod: 'default' }, action) => {
+const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue: '', minDiff: 0, sortMethod: 'default', selectedViewports: [] }, action) => {
   let newState;
   switch (action.type) {
     case 'APPROVE_TEST':
@@ -74,6 +82,23 @@ const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue
     case 'SORT_TESTS':
       newState = Object.assign({}, state, { sortMethod: action.method });
       break;
+    
+    case 'TOGGLE_VIEWPORT':
+      const { viewportLabel } = action;
+      const isSelected = state.selectedViewports.includes(viewportLabel);
+      let newSelectedViewports;
+      if (isSelected) {
+        // Prevent deselecting the last one
+        if (state.selectedViewports.length > 1) {
+          newSelectedViewports = state.selectedViewports.filter(v => v !== viewportLabel);
+        } else {
+          newSelectedViewports = state.selectedViewports;
+        }
+      } else {
+        newSelectedViewports = [...state.selectedViewports, viewportLabel];
+      }
+      newState = Object.assign({}, state, { selectedViewports: newSelectedViewports });
+      break;
 
     default:
       return state;
@@ -86,7 +111,8 @@ const tests = (state = { all: [], filtered: [], filterStatus: 'all', searchValue
       newState.filterStatus,
       newState.searchValue,
       newState.minDiff,
-      newState.sortMethod
+      newState.sortMethod,
+      newState.selectedViewports
     )
   });
 };

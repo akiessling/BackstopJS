@@ -49,7 +49,8 @@ const defaultState = {
     filterStatus: 'all',
     searchValue: '',
     minDiff: 0,
-    sortMethod: 'default'
+    sortMethod: 'default',
+    selectedViewports: [...new Set(window.tests.tests.map(test => test.pair.viewportLabel))]
   },
   scrubber: {
     visible: false,
@@ -80,6 +81,11 @@ const state = persistedState
     }
   : defaultState;
 
+if (persistedState && persistedState.tests && persistedState.tests.selectedViewports) {
+  state.tests.selectedViewports = persistedState.tests.selectedViewports;
+  state.tests.filtered = state.tests.all.filter(test => state.tests.selectedViewports.includes(test.pair.viewportLabel));
+}
+
 /**
  * Creates the Redux store with root reducer, initial state, and devtools extension.
  * TODO: Consider using Redux Toolkit for more efficient and modern state management.
@@ -94,9 +100,12 @@ const store = createStore(
  * Subscribes to store changes to persist layout settings in local storage.
  */
 store.subscribe(function () {
-  const layoutSettings = store.getState().layoutSettings;
+  const { layoutSettings, tests } = store.getState();
   const localStateItems = JSON.stringify({
-    layoutSettings
+    layoutSettings,
+    tests: {
+      selectedViewports: tests.selectedViewports
+    }
   });
   localStorage.setItem('backstopjs', localStateItems);
 });

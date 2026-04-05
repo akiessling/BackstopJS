@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight, sortTests, filterByDiff } from '../../actions';
+import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight, sortTests, filterByDiff, toggleViewport } from '../../actions';
 import { fonts, colors, shadows } from '../../styles';
 
 import SettingOption from '../atoms/SettingOption';
@@ -48,6 +48,40 @@ const WrapperOption = styled.div`
     font-family: ${fonts.latoRegular};
     color: ${colors.primaryText};
     font-size: 14px;
+  }
+`;
+
+const ViewportWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+
+  span {
+    text-align: left;
+    font-family: ${fonts.latoBold};
+    color: ${colors.primaryText};
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+`;
+
+const ViewportOption = styled.label`
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
+
+  input {
+    margin-right: 10px;
+  }
+
+  span {
+    font-family: ${fonts.latoRegular};
+    color: ${colors.primaryText};
+    font-size: 13px;
+    padding-right: 0;
+    margin-bottom: 0;
   }
 `;
 
@@ -167,6 +201,29 @@ class SettingsPopup extends React.Component {
             onChange={(e) => this.props.onFilterByDiff(e.target.value)}
           />
         </WrapperOption>
+        {this.props.tests.all && [...new Set(this.props.tests.all.map(t => t.pair.viewportLabel))].length > 1 && (
+          <>
+            <hr style={{ border: 'none', borderBottom: `1px solid ${colors.borderGray}`, margin: '10px 0' }} />
+            <ViewportWrapper>
+              <span>Viewports</span>
+              {[...new Set(this.props.tests.all.map(t => t.pair.viewportLabel))].map(viewport => {
+                const isSelected = this.props.tests.selectedViewports.includes(viewport);
+                const canToggle = !isSelected || this.props.tests.selectedViewports.length > 1;
+                return (
+                  <ViewportOption key={viewport} disabled={!canToggle}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={!canToggle}
+                      onChange={() => canToggle && this.props.onToggleViewport(viewport)}
+                    />
+                    <span>{viewport}</span>
+                  </ViewportOption>
+                );
+              })}
+            </ViewportWrapper>
+          </>
+        )}
       </PopupWrapper>
     );
   }
@@ -198,6 +255,9 @@ const mapDispatchToProps = dispatch => {
     },
     onFilterByDiff: percent => {
       dispatch(filterByDiff(percent));
+    },
+    onToggleViewport: viewportLabel => {
+      dispatch(toggleViewport(viewportLabel));
     }
   };
 };

@@ -123,3 +123,10 @@ export const filterByDiff = percent => {
     percent
   };
 };
+
+export const toggleViewport = viewportLabel => {
+  return {
+    type: 'TOGGLE_VIEWPORT',
+    viewportLabel
+  };
+};

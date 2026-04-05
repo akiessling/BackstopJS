@@ -60,7 +60,7 @@ export default class TestCard extends React.Component {
             <NavButtons currentId={this.props.numId} lastId={this.props.lastId} />
           )}
         </ButtonsWrapper>
-        <TextDetails info={info} />
+        <TextDetails info={info} numId={this.props.numId} lastId={this.props.lastId} />
         <TestImages info={info} status={status} />
         <ErrorMessages info={info} status={status} />
       </CardWrapper>

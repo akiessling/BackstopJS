@@ -1,5 +1,6 @@
 const fs = require('../util/fs');
 const path = require('path');
+const logger = require('../util/logger')('approve');
 const map = require('p-map');
 
 const FAILED_DIFF_RE = /^failed_diff_/;
@@ -13,7 +14,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       fs.readdir(config.bitmaps_test, (err, list) => {
         if (err) {
-          console.log(err.stack);
+          logger.error(err.stack);
           reject(err);
         }
         const src = path.join(config.bitmaps_test, list[list.length - 1]);

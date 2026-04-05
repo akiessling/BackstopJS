@@ -43,6 +43,17 @@ const visibilitySensorProps = {
   partialVisibility: true
 };
 
+const Placeholder = styled.div`
+  display: ${props => (props.hidden ? 'none' : 'block')};
+  flex: 1 1 auto;
+  padding: 0 25px;
+  padding-top: ${props => (props.withText ? '10px' : '20px')};
+  width: auto;
+  max-width: ${props => (props.settings.imageWidth && props.settings.imageWidth > 0 ? `${props.settings.imageWidth}px` : '100%')};
+  min-height: ${props => (props.settings.imageHeight && props.settings.imageHeight > 0 ? `${props.settings.imageHeight}px` : '400px')};
+  background-color: ${colors.cardWhite};
+`;
+
 class ImagePreview extends React.Component {
   constructor (props) {
     super(props);
@@ -55,7 +66,6 @@ class ImagePreview extends React.Component {
 
   onChange (isVisible) {
     if (isVisible && !this.state.isVisible) {
-      console.log('setting state to visible');
       this.setState({
         isVisible: true
       });
@@ -82,7 +92,9 @@ class ImagePreview extends React.Component {
               <Image {...this.props} src={src} onError={this.onLoadError} />
             </Wrapper>
             )
-          : (<p>Most lemurs only see in one or two colors.</p>)
+          : (
+            <Placeholder hidden={hidden} settings={settings} withText={settings.textInfo} />
+            )
         }
       </VisibilitySensor>
     );

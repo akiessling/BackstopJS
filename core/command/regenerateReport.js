@@ -5,7 +5,7 @@ const report = require('./report');
 
 module.exports = {
   execute: function (config) {
-    function toAbsolute(p) {
+    function toAbsolute (p) {
       return (path.isAbsolute(p)) ? p : path.join(config.projectPath, p);
     }
 
@@ -29,7 +29,6 @@ module.exports = {
       return fs.readFile(reportJsonPath, 'utf8').then(args => {
         const data = args[0];
         const reporter = JSON.parse(data);
-        const reportDir = toAbsolute(config.html_report);
 
         reporter.tests.forEach(test => {
           const pair = test.pair;

@@ -9,6 +9,7 @@ import ImagePreview from '../atoms/ImagePreview';
 const ImagesWrapper = styled.div`
   position: relative;
   display: flex;
+  min-height: ${props => props.minHeight || '0px'};
 `;
 
 class TestImages extends React.Component {
@@ -54,8 +55,10 @@ class TestImages extends React.Component {
       });
     }
 
+    const minHeight = (settings.imageHeight && settings.imageHeight > 0 ? `${settings.imageHeight}px` : '400px');
+
     return (
-      <ImagesWrapper>
+      <ImagesWrapper minHeight={minHeight}>
         {this.state.images.map((img, i) => (
           <ImagePreview
             src={img.src}

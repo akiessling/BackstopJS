@@ -85,12 +85,16 @@ class TextDetails extends React.Component {
       referenceLog,
       testLog
     } = this.props.info;
-    const { settings } = this.props;
+    const { settings, numId, lastId } = this.props;
     const { showPanel } = this.state;
+
+    const counter = `${numId + 1} / ${lastId + 1}`;
 
     return (
       <>
         <Row hidden={!settings.textInfo} sticky={settings.textInfo}>
+          <Label>#</Label>
+          <Value>{counter}</Value>
           <Label>label: </Label>
           <Value>{label}</Value>
           <Label>selector: </Label>
@@ -98,6 +102,8 @@ class TextDetails extends React.Component {
           <UrlDetails url={url} referenceUrl={referenceUrl} />
         </Row>
         <Row>
+          <Label>#</Label>
+          <Value>{counter}</Value>
           <Label>filename: </Label>
           <Value onMouseOver={this.showPanel}>{fileName}</Value>
         </Row>

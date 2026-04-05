@@ -10,8 +10,8 @@ const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod) => {
   if (searchValue && searchValue.length > 0) {
     const search = searchValue.toLowerCase();
     filtered = filtered.filter(test => {
-      const label = (test.pair && test.pair.label || '').toLowerCase();
-      const fileName = (test.pair && test.pair.fileName || '').toLowerCase();
+      const label = ((test.pair && test.pair.label) || '').toLowerCase();
+      const fileName = ((test.pair && test.pair.fileName) || '').toLowerCase();
       return label.includes(search) || fileName.includes(search);
     });
   }
@@ -32,8 +32,8 @@ const applyFiltersAndSort = (all, status, searchValue, minDiff, sortMethod) => {
         valA = parseFloat((a.pair && a.pair.diff && a.pair.diff.misMatchPercentage) || 0);
         valB = parseFloat((b.pair && b.pair.diff && b.pair.diff.misMatchPercentage) || 0);
       } else if (sortMethod.startsWith('label')) {
-        valA = (a.pair && a.pair.label || '').toLowerCase();
-        valB = (b.pair && b.pair.label || '').toLowerCase();
+        valA = ((a.pair && a.pair.label) || '').toLowerCase();
+        valB = ((b.pair && b.pair.label) || '').toLowerCase();
       }
 
       if (valA < valB) return sortMethod.endsWith('Asc') ? -1 : 1;

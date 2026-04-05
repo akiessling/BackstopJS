@@ -288,5 +288,5 @@ module.exports = {
       logger.error('Comparison failed with error:' + e);
     });
   },
-  writeReport: writeReport
+  writeReport
 };

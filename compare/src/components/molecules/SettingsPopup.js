@@ -2,9 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { updateSettings, toggleAllImages, updateImageWidth, updateImageHeight, sortTests, filterByDiff } from '../../actions';
-import { fonts } from '../../styles';
-
-import { colors, shadows } from '../../styles';
+import { fonts, colors, shadows } from '../../styles';
 
 import SettingOption from '../atoms/SettingOption';
 

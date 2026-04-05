@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { approveTest, filterTests } from '../../actions';
 import { colors, fonts } from '../../styles';
 
+import jump from 'jump.js';
+
 const REMOTE_HOST = 'http://127.0.0.1';
 const REMOTE_PORT = location.port;
 const APPROVE_STATUS_TO_LABEL_MAP = Object.freeze({
@@ -53,6 +55,20 @@ class ApproveButton extends React.Component {
     };
   }
 
+  resetScroll () {
+    setTimeout(() => {
+      let target = document.getElementById(this.props.testId);
+      if (!target) {
+        target = document.getElementById(`test${this.props.numId - 1}`);
+      }
+      if (target) {
+        jump(target, { duration: 0, offset: -100 });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }, 50);
+  }
+
   async approve () {
     const { fileName } = this.props;
     const url = `${REMOTE_HOST}:${REMOTE_PORT}/approve?filter=${fileName}`;
@@ -66,6 +82,7 @@ class ApproveButton extends React.Component {
       if (response.ok) {
         this.setState({ approveStatus: 'INITIAL' });
         this.props.approveTest(fileName, this.props.filterStatus);
+        this.resetScroll();
       } else {
         const body = await response.json();
         this.setState({ approveStatus: 'FAILED', errorMsg: body.error });

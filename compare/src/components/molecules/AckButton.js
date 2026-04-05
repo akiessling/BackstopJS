@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { acknowledgeTest, filterTests } from '../../actions';
 import { colors, fonts } from '../../styles';
 
+import jump from 'jump.js';
+
 const REMOTE_HOST = 'http://127.0.0.1';
 const REMOTE_PORT = location.port;
 
@@ -39,6 +41,20 @@ class AckButton extends React.Component {
     };
   }
 
+  resetScroll () {
+    setTimeout(() => {
+      let target = document.getElementById(this.props.testId);
+      if (!target) {
+        target = document.getElementById(`test${this.props.numId - 1}`);
+      }
+      if (target) {
+        jump(target, { duration: 0, offset: -100 });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }, 50);
+  }
+
   async toggleAck () {
     const { fileName, currentStatus } = this.props;
     const nextStatus = currentStatus === 'acknowledged' ? 'fail' : 'acknowledged';
@@ -54,6 +70,7 @@ class AckButton extends React.Component {
       if (response.ok) {
         this.setState({ status: 'INITIAL' });
         this.props.acknowledgeTest(fileName, nextStatus, this.props.filterStatus);
+        this.resetScroll();
       } else {
         const body = await response.json();
         alert(`Failed to update status: ${body.error}`);

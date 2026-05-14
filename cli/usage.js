@@ -9,7 +9,8 @@ const commandsDescription = {
   remote: 'Launch BackstopJS remote service.',
   openReport: 'View the last test report in your browser.',
   regenerateReport: 'Regenerate the HTML report from the last test run data.',
-  serve: 'Serve the HTML report and enable triage (Acknowledge/Un-acknowledge) features.'
+  serve: 'Serve the HTML report and enable triage (Acknowledge/Un-acknowledge) features.',
+  compare: 'Re-run image comparison on the last set of test screenshots.'
 };
 
 const optionsDescription = {

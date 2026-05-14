@@ -23,7 +23,8 @@ const commandNames = [
   'version',
   'stop',
   'regenerateReport',
-  'serve'
+  'serve',
+  'compare'
 ];
 
 /* Commands that are only exposed to higher levels */
@@ -37,7 +38,8 @@ const exposedCommandNames = [
   'version',
   'stop',
   'regenerateReport',
-  'serve'
+  'serve',
+  'compare'
 ];
 
 /* Used to convert an array of objects {name, execute} to a unique object {[name]: execute} */

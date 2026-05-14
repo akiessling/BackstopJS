@@ -87,7 +87,7 @@ Build + Push:
 
 ```
 export BACKSTOPJS_VERSION=6.1.4
-docker buildx build --push --build-arg BACKSTOPJS_VERSION --platform linux/amd64,linux/arm64 --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION docker
+docker buildx build --push --build-arg BACKSTOPJS_VERSION --platform linux/amd64,linux/arm64 --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION -f docker/Dockerfile .
 
 ```
 
@@ -99,13 +99,12 @@ AMD64:
 
 ```
 export BACKSTOPJS_VERSION=6.1.4
-docker buildx build --build-arg BACKSTOPJS_VERSION --platform linux/amd64 --load --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION docker
+docker buildx build --build-arg BACKSTOPJS_VERSION --platform linux/amd64 --load --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION -f docker/Dockerfile .
 ```
 
 ARM64:
 
 ```
 export BACKSTOPJS_VERSION=6.1.4
-docker buildx build --build-arg BACKSTOPJS_VERSION --platform linux/arm64 --load --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION docker
+docker buildx build --build-arg BACKSTOPJS_VERSION --platform linux/arm64 --load --tag backstopjs/backstopjs:$BACKSTOPJS_VERSION -f docker/Dockerfile .
 ```
-

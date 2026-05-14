@@ -1,3 +1,9 @@
+FROM node:20-bullseye AS backstopjs-package
+
+WORKDIR /tmp/backstopjs-source
+COPY . .
+RUN mkdir /tmp/backstopjs-package && npm pack --pack-destination /tmp/backstopjs-package
+
 # use bullseye node base, as debian does provide a chromium for arm64 and amd64 flavour
 FROM node:20-bullseye
 
@@ -26,7 +32,8 @@ RUN apt-get -qq update >/dev/null && apt-get install -qq \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # playwright shared browser path (does install a 2nd chromium - can't be skipped)
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH} && npm install -g --unsafe-perm=true --allow-root backstopjs@${BACKSTOPJS_VERSION} && npx --yes --verbose --foreground-scripts playwright install --with-deps
+COPY --from=backstopjs-package /tmp/backstopjs-package/backstopjs-*.tgz /tmp/backstopjs.tgz
+RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH} && npm install -g --unsafe-perm=true --allow-root --omit=dev /tmp/backstopjs.tgz && rm /tmp/backstopjs.tgz && npx --yes --verbose --foreground-scripts playwright install --with-deps
 
 # set executable path
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium

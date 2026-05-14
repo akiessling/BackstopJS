@@ -1,0 +1,13 @@
+.git
+.DS_Store
+node_modules
+npm-debug.log
+*.log
+
+integrationTestDir
+*integrationTestDir
+
+**/backstop_data/bitmaps_test/
+**/backstop_data/html_report/
+**/backstop_data/json_report/
+**/backstop_data/reports/

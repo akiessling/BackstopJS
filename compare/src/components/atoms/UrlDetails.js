@@ -39,7 +39,7 @@ export default class DiffDetails extends React.Component {
             </Link>
           )}
           {anchor && (
-            <Link withSeperator href={'#' + anchor} target="_blank">
+            <Link withSeperator href={'#' + anchor} target="_top">
               permalink
             </Link>
           )}

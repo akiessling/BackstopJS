@@ -95,14 +95,14 @@ class TextDetails extends React.Component {
 
     return (
       <>
-        <Row hidden={!settings.textInfo} sticky={settings.textInfo}>
+        <Row id={fileName} hidden={!settings.textInfo} sticky={settings.textInfo}>
           <Label>#</Label>
           <Value>{counter}</Value>
           <Label>label: </Label>
-          <Value>{label}</Value>
+          <Value onMouseOver={this.showPanel}>{label}</Value>
           <Label>selector: </Label>
           <Value>{selector}</Value>
-          <UrlDetails url={url} referenceUrl={referenceUrl} />
+          <UrlDetails url={url} referenceUrl={referenceUrl} anchor={fileName}/>
           {settings.textInfo && this.props.children}
         </Row>
         <Row>
@@ -131,7 +131,7 @@ class TextDetails extends React.Component {
                 <LogDetails referenceLog={referenceLog} testLog={testLog} />
               )
             }
-            <UrlDetails url={url} referenceUrl={referenceUrl} />
+            <UrlDetails url={url} referenceUrl={referenceUrl} anchor={fileName}/>
             <DiffDetails diff={diff} />
           </Row>
         </DetailsPanel>

@@ -1,24 +1,17 @@
-const mockery = require('mockery');
 const assert = require('assert');
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 const sinon = require('sinon');
 
 describe('cli', function () {
-  beforeEach(function () {
-    mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-  });
-
   afterEach(function () {
-    mockery.deregisterAll();
-    mockery.disable();
+    delete process.exitCode;
   });
 
   it('should call the runner without custom options correctly', function (done) {
     process.argv = ['node', 'backstop', 'test'];
     const promiseMock = Promise.resolve();
     const runnerMock = sinon.stub().returns(promiseMock);
-    mockery.registerMock('../core/runner', runnerMock);
-
-    require('../../cli/index');
+    proxyquire('../../cli/index', { '../core/runner': runnerMock });
 
     promiseMock.then(() => {
       assert.strictEqual(process.exitCode, undefined);
@@ -31,9 +24,7 @@ describe('cli', function () {
     process.argv = ['node', 'backstop', 'test'];
     const promiseMock = Promise.reject(new Error('errorMock'));
     const runnerMock = sinon.stub().returns(promiseMock);
-    mockery.registerMock('../core/runner', runnerMock);
-
-    require('../../cli/index');
+    proxyquire('../../cli/index', { '../core/runner': runnerMock });
 
     promiseMock.catch(() => {
       assert.strictEqual(process.exitCode, 1);

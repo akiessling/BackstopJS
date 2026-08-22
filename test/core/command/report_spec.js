@@ -1,5 +1,5 @@
-const mockery = require('mockery');
 const assert = require('assert');
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 const sinon = require('sinon');
 
 describe('core report', function () {
@@ -16,14 +16,6 @@ describe('core report', function () {
     }
   };
 
-  before(function () {
-    mockery.enable({ warnOnUnregistered: false });
-  });
-
-  after(function () {
-    mockery.disable();
-  });
-
   it('should generate two json reports and a default browser report when config.report specifies json', function () {
     const reporterClass = { failed: () => undefined, passed: () => 'passed', getReport: () => { return { test: 123 }; } };
     const compareMock = sinon.stub().returns(Promise.resolve(reporterClass));
@@ -32,11 +24,11 @@ describe('core report', function () {
     };
     const writeFileStub = sinon.stub().returns(Promise.resolve());
     const fsMock = { ensureDir: () => Promise.resolve(), writeFile: writeFileStub, copy: () => Promise.resolve() };
-    mockery.registerMock('../util/compare/', compareMock);
-    mockery.registerMock('../util/logger', loggerMock);
-    mockery.registerMock('../util/fs', fsMock);
-
-    const report = require('../../../core/command/report');
+    const report = proxyquire('../../../core/command/report', {
+      '../util/compare/': compareMock,
+      '../util/logger': loggerMock,
+      '../util/fs': fsMock
+    });
 
     return report.execute(config).then(() => {
       assert.strictEqual(writeFileStub.callCount, 3);

@@ -1,8 +1,8 @@
 const path = require('path');
-const temp = require('temp');
+const { randomUUID } = require('node:crypto');
 const fs = require('fs');
 const hash = require('object-hash');
-const tmpdir = require('os').tmpdir();
+const tmpdir = require('node:os').tmpdir();
 const version = require('../../package.json').version;
 
 function extendConfig (config, userConfig) {
@@ -82,7 +82,7 @@ function jsonReport (config, userConfig) {
 
 function comparePaths (config) {
   config.comparePath = path.join(config.backstop, 'compare/output');
-  config.tempCompareConfigFileName = temp.path({ suffix: '.json' });
+  config.tempCompareConfigFileName = path.join(tmpdir, randomUUID() + '.json');
 }
 
 function captureConfigPaths (config) {

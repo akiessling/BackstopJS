@@ -5,7 +5,7 @@ module.exports = async (page, scenario) => {
   const cookiePath = scenario.cookiePath;
 
   // READ COOKIES FROM FILE IF EXISTS
-  if (fs.existsSync(cookiePath)) {
+  if (cookiePath && fs.existsSync(cookiePath)) {
     cookies = JSON.parse(fs.readFileSync(cookiePath));
   }
 

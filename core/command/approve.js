@@ -1,7 +1,7 @@
 const fs = require('../util/fs');
 const path = require('path');
 const logger = require('../util/logger')('approve');
-const map = require('p-map');
+const map = require('../util/pMap');
 
 const FAILED_DIFF_RE = /^failed_diff_/;
 const FILTER_DEFAULT = /\w+/;

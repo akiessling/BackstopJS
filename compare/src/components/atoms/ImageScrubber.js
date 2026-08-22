@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import TwentyTwenty from 'backstop-twentytwenty';
+import TwentyTwenty from './TwentyTwenty';
 import { colors, fonts, shadows } from '../../styles';
 
 const ScrubberViewBtn = styled.button`
@@ -270,9 +270,6 @@ export default class ImageScrubber extends React.Component {
             }}
           >
             <TwentyTwenty
-              verticalAlign="top"
-              minDistanceToBeginInteraction={0}
-              maxAngleToBeginInteraction={Infinity}
               initialPosition={position}
               newPosition={position}
             >

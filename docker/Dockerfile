@@ -1,42 +1,51 @@
-FROM node:20-bullseye AS backstopjs-package
+ARG NODE_VERSION=24.19.0
+
+FROM node:${NODE_VERSION}-bookworm AS backstopjs-package
 
 WORKDIR /tmp/backstopjs-source
 COPY . .
 RUN mkdir /tmp/backstopjs-package && npm pack --pack-destination /tmp/backstopjs-package
 
-# use bullseye node base, as debian does provide a chromium for arm64 and amd64 flavour
-FROM node:20-bullseye
+FROM node:${NODE_VERSION}-bookworm
 
 ARG BACKSTOPJS_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV BACKSTOPJS_VERSION=$BACKSTOPJS_VERSION
+ENV BACKSTOPJS_VERSION=${BACKSTOPJS_VERSION} \
+  PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers \
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+  PUPPETEER_SKIP_DOWNLOAD=true
 
-# install chromium and its deps
-RUN apt-get -qq update >/dev/null && apt-get install -qq \
+# Install the system Chromium used by Puppeteer plus fonts required for
+# deterministic screenshots. Playwright installs its version-matched browsers
+# and remaining system libraries below.
+RUN apt-get -qq update >/dev/null && apt-get install -qq --no-install-recommends \
+  chromium \
   fonts-liberation \
-  # cyrillic
-  xfonts-cyrillic \
-  # chinese
-  xfonts-wqy fonts-wqy-zenhei fonts-arphic-ukai fonts-arphic-uming \
-  # japanese
-  fonts-ipafont-mincho fonts-ipafont-gothic fonts-ipafont fonts-vlgothic \
-  # korean
-  fonts-unfonts-core fonts-unfonts-extra \
-  # cjk + emoji font
-  fonts-noto-cjk fonts-noto-color-emoji \
-  # chromium
-  chromium >/dev/null && apt-get -qq clean >/dev/null && rm -rf /var/lib/apt/lists/*
+  fonts-arphic-ukai \
+  fonts-arphic-uming \
+  fonts-ipafont-gothic \
+  fonts-ipafont-mincho \
+  fonts-noto-cjk \
+  fonts-noto-color-emoji \
+  fonts-unfonts-core \
+  fonts-unfonts-extra \
+  fonts-vlgothic \
+  fonts-wqy-zenhei \
+  tini \
+  xfonts-wqy \
+  >/dev/null \
+  && apt-get -qq clean >/dev/null \
+  && rm -rf /var/lib/apt/lists/*
 
-# skip download, we already have it installed
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-# playwright shared browser path (does install a 2nd chromium - can't be skipped)
-ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 COPY --from=backstopjs-package /tmp/backstopjs-package/backstopjs-*.tgz /tmp/backstopjs.tgz
-RUN mkdir ${PLAYWRIGHT_BROWSERS_PATH} && npm install -g --unsafe-perm=true --allow-root --omit=dev /tmp/backstopjs.tgz && rm /tmp/backstopjs.tgz && npx --yes --verbose --foreground-scripts playwright install --with-deps
+RUN mkdir -p "${PLAYWRIGHT_BROWSERS_PATH}" \
+  && npm install --global --omit=dev /tmp/backstopjs.tgz \
+  && node /usr/local/lib/node_modules/backstopjs/node_modules/playwright/cli.js install --with-deps \
+  && rm /tmp/backstopjs.tgz \
+  && apt-get -qq clean >/dev/null \
+  && rm -rf /var/lib/apt/lists/* /root/.npm
 
-# set executable path
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 WORKDIR /src
 
-ENTRYPOINT ["backstop"]
+ENTRYPOINT ["tini", "--", "backstop"]

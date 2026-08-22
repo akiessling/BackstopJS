@@ -4,15 +4,8 @@ A self-contained Docker image to run [BackstopJS](https://github.com/garris/Back
 
 [Visual Regression Testing with BackstopJS in a Docker container](https://blog.docksal.io/visual-regression-testing-with-backstopjs-in-a-docker-container-dfd1b9ae8582)
 
-Features:
-
-- [BackstopJS 3.x](https://github.com/garris/BackstopJS)
-- [Chrome-headless](https://www.google.com/chrome/browser/canary.html)
-
-
-## Versions
-
-- `backstopjs/backstopjs` - BackstopJS v3 with Chrome Headless support
+The image contains BackstopJS, Node.js 24 LTS, a system Chromium for the
+Puppeteer engine and the version-matched Playwright browsers.
 
 
 ## Usage
@@ -20,9 +13,8 @@ Features:
 Use this image as if you were using a binary.  
 Working directory is expected to be mounted at `/src` in the container.
 
-```
-$ docker run --rm -v $(pwd):/src backstopjs/backstopjs --version
-BackstopJS v3.x.x
+```sh
+docker run --rm -v "$(pwd):/src" backstopjs/backstopjs --version
 
 # On Windows use:
 $(pwd -W)
@@ -30,8 +22,8 @@ $(pwd -W)
 
 You can also add a shell alias (in `.bashrc`, `.zshrc`, etc.) for convenience.
 
-```
-alias backstop='docker run --rm -v $(pwd):/src backstopjs/backstopjs "$@"'
+```sh
+alias backstop='docker run --rm --ipc=host -v "$(pwd):/src" backstopjs/backstopjs "$@"'
 ```
 
 Restart your shell or open a new one, then
@@ -44,18 +36,17 @@ BackstopJS v3.x.x
 
 ## Sample test
 
-```
-docker run --rm -v $(pwd):/src backstopjs/backstopjs init
-docker run --rm -v $(pwd):/src backstopjs/backstopjs reference
-docker run --rm -v $(pwd):/src backstopjs/backstopjs test
+```sh
+docker run --rm --ipc=host -v "$(pwd):/src" backstopjs/backstopjs init
+docker run --rm --ipc=host -v "$(pwd):/src" backstopjs/backstopjs reference
+docker run --rm --ipc=host -v "$(pwd):/src" backstopjs/backstopjs test
 ```
 
 
 ## Browser engines
 
-By default BackstopJS is using Headless Chrome to take screenshots.
-
-Chrome is pre-installed in the container.
+Puppeteer uses the Debian Chromium installed at `/usr/bin/chromium`.
+Playwright uses its own version-matched Chromium, Firefox and WebKit builds.
 
 
 ## Limitations
@@ -67,8 +58,8 @@ Chrome is pre-installed in the container.
 
 The following command will start a bash session in the container.
 
-```
-docker run --rm -v $(pwd):/src -it --entrypoint=bash backstopjs/backstopjs
+```sh
+docker run --rm --ipc=host -v "$(pwd):/src" -it --entrypoint=bash backstopjs/backstopjs
 ```
 
 

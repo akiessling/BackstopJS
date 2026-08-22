@@ -1,5 +1,5 @@
 const path = require('path');
-const chalk = require('chalk');
+const chalk = require('../util/colors');
 const _ = require('lodash');
 const cloneDeep = require('lodash/cloneDeep');
 

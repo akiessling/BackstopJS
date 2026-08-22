@@ -1,4 +1,4 @@
-const mockery = require('mockery');
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 const sinon = require('sinon');
 
 describe('compare', function () {
@@ -8,19 +8,15 @@ describe('compare', function () {
   const error = new Error();
 
   before(function () {
-    mockery.enable({ warnOnUnregistered: false, warnOnReplace: false, useCleanCache: true });
-    mockery.registerMock('./compare-hash', compareHashes);
-    mockery.registerMock('./compare-resemble', compareResemble);
-    compare = require('../../../../core/util/compare/compare');
+    compare = proxyquire('../../../../core/util/compare/compare', {
+      './compare-hash': compareHashes,
+      './compare-resemble': compareResemble
+    });
   });
 
   afterEach(() => {
     compareResemble.resetBehavior();
     compareHashes.resetBehavior();
-  });
-
-  after(function () {
-    mockery.disable();
   });
 
   it.skip('should resolve if compare-hashes succeed', function () {

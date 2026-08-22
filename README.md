@@ -1082,7 +1082,7 @@ One of the things Backstop does for you is manage all your screenshot files.  Ba
 First off, You are awesome! Thanks for your interest, time and hard work!  Here are some tips...
 
 <!-- omit from toc -->
-### We use `eslint-config-semistandard`.
+### We use ESLint's recommended rules and Prettier.
 
 Please run the linter before each submit, as follows. Thank you. 🙇🏽
 
@@ -1309,6 +1309,5 @@ BackstopJS was created and is maintained by [Garris Shipon](https://www.linkedin
 - [Torsten Krah](https://github.com/tkrah)
 - [Joel Brown](https://github.com/FrostyShosty)
 - [Dan Grebb](https://github.com/dgrebb)
-
 
 

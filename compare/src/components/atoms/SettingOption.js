@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import ToggleButton from 'react-toggle-button';
 
 import { colors, fonts } from '../../styles';
 
@@ -19,6 +18,27 @@ const WrapperOption = styled.div`
   }
 `;
 
+const ToggleButton = styled.button`
+  width: 50px;
+  height: 26px;
+  padding: 3px;
+  border: 0;
+  border-radius: 13px;
+  background: ${props => (props.$active ? colors.green : colors.secondaryText)};
+  cursor: pointer;
+
+  &::after {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: ${colors.cardWhite};
+    content: '';
+    transform: translateX(${props => (props.$active ? '24px' : '0')});
+    transition: transform 150ms ease-in-out;
+  }
+`;
+
 export default class SettingOption extends React.Component {
   render () {
     const { label, value, onToggle } = this.props;
@@ -27,7 +47,13 @@ export default class SettingOption extends React.Component {
       <WrapperOption>
         <span>{label}</span>
 
-        <ToggleButton value={value || false} onToggle={onToggle} />
+        <ToggleButton
+          type="button"
+          role="switch"
+          aria-checked={Boolean(value)}
+          $active={Boolean(value)}
+          onClick={() => onToggle(!value)}
+        />
       </WrapperOption>
     );
   }

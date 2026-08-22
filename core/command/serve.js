@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const portfinder = require('portfinder');
-const open = require('opn');
+const open = require('../util/open');
 
 module.exports = {
   execute: function (config) {
@@ -58,7 +58,7 @@ module.exports = {
           logger.log(`Report server started at: ${parentPath}`);
           logger.log(`Report available at: ${url}`);
 
-          open(url, { wait: false });
+          open(url, { wait: false }).catch(err => logger.error('Unable to open report:', err));
 
           logger.log('Press Ctrl + C to exit.');
           // Process remains open as long as the promise is pending.

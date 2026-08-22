@@ -1,4 +1,4 @@
-const chalk = require('chalk');
+const chalk = require('./colors');
 const _ = require('lodash');
 const util = require('util');
 const makeSpaces = require('./makeSpaces');

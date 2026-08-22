@@ -1,7 +1,7 @@
 const cloneDeep = require('lodash/cloneDeep');
 const fs = require('./fs');
 const _ = require('lodash');
-const pMap = require('p-map');
+const pMap = require('./pMap');
 
 const runPuppet = require('./runPuppet');
 const { createPlaywrightBrowser, runPlaywright, disposePlaywrightBrowser } = require('./runPlaywright');

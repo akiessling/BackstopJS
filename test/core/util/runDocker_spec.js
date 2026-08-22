@@ -1,28 +1,29 @@
-const mockery = require('mockery');
 const assert = require('assert');
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
 describe('runDocker', function () {
-  beforeEach(function () {
-    mockery.enable({ warnOnUnregistered: false, useCleanCache: true });
-  });
+  const originalCwd = process.cwd;
+  const originalArgv = process.argv;
 
   afterEach(function () {
-    mockery.deregisterAll();
-    mockery.disable();
+    process.cwd = originalCwd;
+    process.argv = originalArgv;
   });
 
   it('should run correct docker command', function (done) {
     process.cwd = () => '/path/mock';
     process.argv = ['test'];
-    mockery.registerMock('../../package', { version: 'version.mock' });
-    mockery.registerMock('child_process', {
-      spawn: function (dockerCommand) {
-        assert.strictEqual(
-          dockerCommand,
-          'docker run --rm -it --mount type=bind,source="/path/mock",target=/src backstopjs/backstopjs:version.mock test' +
-          ' "--moby=true" "--config=my_config.json" "--filter=my_filter"');
-        done();
-        return { on: () => {} };
+    const { runDocker } = proxyquire('../../../core/util/runDocker', {
+      '../../package': { version: 'version.mock' },
+      child_process: {
+        spawn: function (dockerCommand) {
+          assert.strictEqual(
+            dockerCommand,
+            'docker run --rm -it --mount type=bind,source="/path/mock",target=/src backstopjs/backstopjs:version.mock test' +
+            ' "--moby=true" "--config=my_config.json" "--filter=my_filter"');
+          done();
+          return { on: () => {} };
+        }
       }
     });
 
@@ -34,17 +35,18 @@ describe('runDocker', function () {
       }
     };
 
-    const { runDocker } = require('../../../core/util/runDocker');
     runDocker(config, 'test');
   });
 
   it('should not pass undefined args to docker', function (done) {
     process.argv = ['test'];
-    mockery.registerMock('child_process', {
-      spawn: function (dockerCommand) {
-        assert(!dockerCommand.includes('--filter'));
-        done();
-        return { on: () => {} };
+    const { runDocker } = proxyquire('../../../core/util/runDocker', {
+      child_process: {
+        spawn: function (dockerCommand) {
+          assert(!dockerCommand.includes('--filter'));
+          done();
+          return { on: () => {} };
+        }
       }
     });
 
@@ -55,22 +57,23 @@ describe('runDocker', function () {
       }
     };
 
-    const { runDocker } = require('../../../core/util/runDocker');
     runDocker(config, 'test');
   });
 
   it('should create tmp config file if config arg is an object', function (done) {
     process.argv = ['test'];
-    mockery.registerMock('./fs', {
-      writeFile: function () {
-        return Promise.resolve();
-      }
-    });
-    mockery.registerMock('child_process', {
-      spawn: function (dockerCommand) {
-        assert(dockerCommand.includes('--config=backstop.config-for-docker.json'));
-        done();
-        return { on: () => {} };
+    const { runDocker } = proxyquire('../../../core/util/runDocker', {
+      './fs': {
+        writeFile: function () {
+          return Promise.resolve();
+        }
+      },
+      child_process: {
+        spawn: function (dockerCommand) {
+          assert(dockerCommand.includes('--config=backstop.config-for-docker.json'));
+          done();
+          return { on: () => {} };
+        }
       }
     });
 
@@ -83,7 +86,6 @@ describe('runDocker', function () {
       }
     };
 
-    const { runDocker } = require('../../../core/util/runDocker');
     runDocker(config, 'test');
   });
 });

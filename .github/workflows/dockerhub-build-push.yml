@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 env:
-  NODE_VERSION: 20
+  NODE_VERSION: 24.19.0
 
 jobs:
   build-and-push-image:
@@ -36,8 +36,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: ⬢ Setup Node & Cache
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
           cache-dependency-path: package-lock.json
 
@@ -50,4 +51,4 @@ jobs:
 
       - name: 🐳 Build & Push to Docker Hub
         run: |
-          docker buildx build --push --platform linux/amd64,linux/arm64 -t backstopjs/backstopjs:$PV -t backstopjs/backstopjs:latest --build-arg BACKSTOPJS_VERSION=$PV docker
+          docker buildx build --push --platform linux/amd64,linux/arm64 -t backstopjs/backstopjs:$PV -t backstopjs/backstopjs:latest --build-arg BACKSTOPJS_VERSION=$PV -f docker/Dockerfile .

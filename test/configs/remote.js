@@ -1,5 +1,3 @@
-/* eslint-env browser, node */
-
 module.exports = {
   id: 'backstop-remote',
   viewports: [

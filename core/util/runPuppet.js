@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const fs = require('./fs');
 const path = require('path');
-const chalk = require('chalk');
+const chalk = require('./colors');
 const _ = require('lodash');
 const ensureDirectoryPath = require('./ensureDirectoryPath');
 const injectBackstopTools = require('../../capture/backstopTools.js');

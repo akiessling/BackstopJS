@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import VisibilitySensor from 'react-visibility-sensor';
 import styled from 'styled-components';
 import { colors, fonts } from '../../styles';
 
@@ -36,13 +35,6 @@ const Label = styled.span`
   font-size: 12px;
 `;
 
-const visibilitySensorProps = {
-  offset: {
-    bottom: -400
-  },
-  partialVisibility: true
-};
-
 const Placeholder = styled.div`
   display: ${props => (props.hidden ? 'none' : 'block')};
   flex: 1 1 auto;
@@ -57,18 +49,32 @@ const Placeholder = styled.div`
 class ImagePreview extends React.Component {
   constructor (props) {
     super(props);
+    this.previewRef = React.createRef();
     this.state = {
+      imgLoadError: false,
       isVisible: false
     };
     this.onLoadError = this.onLoadError.bind(this);
-    this.onChange = this.onChange.bind(this);
   }
 
-  onChange (isVisible) {
-    if (isVisible && !this.state.isVisible) {
-      this.setState({
-        isVisible: true
-      });
+  componentDidMount () {
+    if (!('IntersectionObserver' in window)) {
+      this.setState({ isVisible: true });
+      return;
+    }
+
+    this.visibilityObserver = new window.IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        this.setState({ isVisible: true });
+        this.visibilityObserver.disconnect();
+      }
+    }, { rootMargin: '0px 0px 400px 0px' });
+    this.visibilityObserver.observe(this.previewRef.current);
+  }
+
+  componentWillUnmount () {
+    if (this.visibilityObserver) {
+      this.visibilityObserver.disconnect();
     }
   }
 
@@ -83,21 +89,16 @@ class ImagePreview extends React.Component {
     if (!src || src === '../..' || this.state.imgLoadError) {
       src = BASE64_PNG_STUB;
     }
-    return (
-      <VisibilitySensor {...visibilitySensorProps} onChange={this.onChange}>
-        {this.state.isVisible
-          ? (
-            <Wrapper hidden={hidden} withText={settings.textInfo}>
-              <Label>{label}</Label>
-              <Image {...this.props} src={src} onError={this.onLoadError} />
-            </Wrapper>
-            )
-          : (
-            <Placeholder hidden={hidden} settings={settings} withText={settings.textInfo} />
-            )
-        }
-      </VisibilitySensor>
-    );
+    return this.state.isVisible
+      ? (
+        <Wrapper ref={this.previewRef} hidden={hidden} withText={settings.textInfo}>
+          <Label>{label}</Label>
+          <Image {...this.props} src={src} onError={this.onLoadError} />
+        </Wrapper>
+        )
+      : (
+        <Placeholder ref={this.previewRef} hidden={hidden} settings={settings} withText={settings.textInfo} />
+        );
   }
 }
 

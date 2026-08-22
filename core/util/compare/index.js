@@ -1,5 +1,5 @@
 const path = require('path');
-const map = require('p-map');
+const map = require('../pMap');
 const fs = require('fs');
 const cp = require('child_process');
 

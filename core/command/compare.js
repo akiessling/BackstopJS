@@ -47,7 +47,7 @@ module.exports = {
           // This avoids issues with relative paths like '../bitmaps_test/...' in report.json
           const referencePath = path.join(toAbsolute(config.bitmaps_reference), pair.fileName);
           const testPath = path.join(bitmapsTestPath, latestRun, pair.fileName);
-          
+
           return {
             reference: referencePath,
             test: testPath,

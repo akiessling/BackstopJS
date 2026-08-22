@@ -25,7 +25,7 @@ const Link = styled.a`
 
 export default class DiffDetails extends React.Component {
   render () {
-    const { url, referenceUrl } = this.props;
+    const { url, referenceUrl, anchor } = this.props;
     return (
       <span>
         <Label>url: </Label>
@@ -36,6 +36,11 @@ export default class DiffDetails extends React.Component {
           {referenceUrl && (
             <Link withSeperator href={referenceUrl} target="_blank">
               reference
+            </Link>
+          )}
+          {anchor && (
+            <Link withSeperator href={'#' + anchor} target="_top">
+              permalink
             </Link>
           )}
         </Value>

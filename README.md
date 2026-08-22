@@ -1133,24 +1133,23 @@ Want to make sure your changes work with the `--docker` option? You can rebuild 
 
 tl;dr
 
-- `npm run init-docker-builder`
 - customize `./docker/Dockerfile`
-- `npm run build-docker`
-- `npm run build-and-load-docker`
+- `npm run build-local-docker`
+- run BackstopJS with the `--docker` option
 
 <details>
   <summary>Details</summary>
-  <p>The Docker image is created via `npm run build-docker`, which uses a custom docker builder, created via `npm run init-docker-builder`. This ensures the Docker image can run on multiple platform architectures (M1 vs. Inteal Macs for example). [Read more](https://docs.docker.com/build/building/multi-platform/ "Docker Documentation)) about this.</p>
+  <p><code>npm run build-local-docker</code> builds the image for the current platform and loads it into the local Docker image store so it can be used with BackstopJS's <code>--docker</code> option.</p>
 
-  <p>Because BackstopJS's Docker image is created with a custom `docker buildx` builder, one must "load" the image into their local registry. This is where `npm run build-and-load-docker` comes in handy.</p>
+  <p><code>npm run build-multi-platform-docker</code> checks the image build for both <code>linux/amd64</code> and <code>linux/arm64</code>. It requires the active Buildx builder to support multi-platform builds and does not load the images into the local Docker image store.</p>
 </details>
 
 #### Publishing to Container Registries
 
-If you have access to Docker Hub @backstop/backstop, then this command will push a new public BackstopJS docker image with the current version tag...
+If you have access to the BackstopJS repository on Docker Hub, this command builds and pushes a multi-platform image with the current version and latest tags:
 
 ```sh
-npm run push-docker
+npm run publish-multi-platform-docker
 ```
 
 There are various other ways one can publish to ghcr.io, *.ecr.*.amazonaws.com etc. but those are beyond the scope of this README.
@@ -1309,5 +1308,4 @@ BackstopJS was created and is maintained by [Garris Shipon](https://www.linkedin
 - [Torsten Krah](https://github.com/tkrah)
 - [Joel Brown](https://github.com/FrostyShosty)
 - [Dan Grebb](https://github.com/dgrebb)
-
 
